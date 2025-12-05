@@ -2,7 +2,7 @@ import os
 import sys
 
 offset = 2  #How far the data is from the start of the file
-storedBlocks = [None] * 3
+storedBlocks = [bytearray(b'\x00' * 512), bytearray(b'\x00' * 512), bytearray(b'\x00' * 512)]
 magicNumber = int.from_bytes("4348PRJ3".encode('ascii'), byteorder = 'big', signed=False)
 
 
@@ -14,10 +14,53 @@ def get_field(workingBlockID, index):
 
     return int.from_bytes(storedBlocks[workingBlockID][index: index + 8].replace(b" ", b""), byteorder = 'big', signed=False)
 
+def set_field(workingBlockID, index, value):
+    index = index * 8
+    if index > 512 or index < 0:
+        print("ERROR: invalid field index")
+        sys.exit()
+
+    k = 0
+    for i in range(index, index + 8):
+        print(value[k])
+        storedBlocks[workingBlockID][i] = value[k]
+        k += 1
+
 def get_block(workingFile, blockNumber, memoryDest):
+    if workingFile.mode != "rb":
+        print("ERROR: incorrect file mode in get_block")
+        sys.exit()
+
     workingFile.seek(blockNumber * 512 + offset)
 
     storedBlocks[memoryDest] = workingFile.read(512)
+
+def set_block(filename, blockNumber):
+    workingFile = open(filename, "wb")
+
+    workingFile.seek(blockNumber * 512 + offset)
+
+    print(storedBlocks[blockNumber])
+    workingFile.write(storedBlocks[blockNumber])
+
+    workingFile.close()
+
+def create_file(filename):
+    if os.path.exists(filename):
+        print("ERROR: file already exists")
+        #sys.exit()
+
+    set_field(0, 0, "4348PRJ3".encode('ascii'))
+    set_field(0, 1, "4348PRJ3".encode('ascii'))
+    set_field(0, 0, "4348PRJ3".encode('ascii'))
+
+    set_block(filename, 0)
+
+    #workingFile = open(filename, "rb")
+    #get_block(workingFile, 0, 0)
+    #print(get_field(0, 0))
+    #workingFile.close()
+
 
 def print_file(filename):
     try:
@@ -75,7 +118,12 @@ if len(sys.argv) < 2:
     sys.exit()
 
 task = sys.argv[1]
-if task == "print":
+if task == "create":
+    if len(sys.argv) < 3:
+        print("ERROR: missing file name")
+    else:
+        create_file(sys.argv[2])
+elif task == "print":
     if len(sys.argv) > 2:
         print_file(sys.argv[2])
     else:
