@@ -85,3 +85,9 @@ I have completed print
 There were some rough patches, but it went smoother than expected
 Now that I have tools set up, I can start making good progress
 I'll take a short break, then work on handling input
+
+[11:10 pm]
+Back to work and input handling is done
+The main point of interest was learning how to use command line arguments in my IDE
+Now I can start implementing other methods, beginning with extract
+Extract should be the same as print, only outputting to a file rather than console
