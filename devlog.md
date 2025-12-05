@@ -91,3 +91,20 @@ Back to work and input handling is done
 The main point of interest was learning how to use command line arguments in my IDE
 Now I can start implementing other methods, beginning with extract
 Extract should be the same as print, only outputting to a file rather than console
+
+I'm rather bad at following consistent formatting of my code it seems
+I'm checking for missing arguments in 3 different ways
+A formatting pass looks like it'll be on the agenda if I have extra time after finishing everything else
+
+[11:30]
+Extract is done, I made a file and the format matches that of print
+I ended up separating the different key/value pairs with newlines, that should be fine
+I debated including a header row of "key/value" but ultimately decided against it
+I figured that a header row would be unexpected and thus conflict with potential automated testing tools
+For that reason, I also got rid of my header row from print
+I also ended up reusing a lot of code from print_file, perhaps I could make more general methods to clean it up
+
+Next up is create, and that means being able to write to fields
+I can't use get_field directly for this, but I can reuse most of the code
+It would be good practice to also check the mode the file is open in while I do this
+While an incorrect open mode can only cause problems with bugs in the code, checks are useful to catch those bugs
