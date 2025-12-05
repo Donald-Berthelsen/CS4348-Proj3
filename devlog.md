@@ -12,3 +12,14 @@ And in doing that, I would need to be able to read commands
 And if I'm reading commands already, it shouldn't be too hard to implement create
 I don't know how difficult it will be to implement print, so I don't know if I'll achieve it this session
 Part of this session will be exploratory as I figure out how to approach the problem
+
+[8:20 pm]
+I'm not too sure where to begin, after opening the file I'm in unknown territory
+First I'll need a method that can retrieve blocks of data, I'll have to look up how to do that
+Then I'll need to parse the blocks one by one
+If I can retrieve blocks, then I can store them as a global variable to force the 3 in the chamber rule
+I only care about the first 8 bytes of the first block to verify the magic number
+Reading the magic number should be a good test for reading from the file
+It looks like I'll only need to read from blocks in 8 byte increments
+This means I can have another method to retrieve data at a given location in the block
+My next goal will be to read the magic number using these get block and get 8-byt methods
