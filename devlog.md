@@ -75,3 +75,13 @@ All the fields are ints, and the magic number can be treated as an int as well
 Get field works, and with that I have my abstractions done
 Finishing print should be a fairly standard process from here
 I feel like I'm out of the woods and back into familiar territory
+
+I'll check the magic number first so I don't forget it
+Things are going smoothly now that I can easily access arbitrary fields
+I also need to check if the file opened properly
+
+[10:40 pm]
+I have completed print
+There were some rough patches, but it went smoother than expected
+Now that I have tools set up, I can start making good progress
+I'll take a short break, then work on handling input
