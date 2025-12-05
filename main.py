@@ -41,4 +41,15 @@ def print_file(filename):
 
     workingFile.close()
 
-print_file("test.idx")
+if len(sys.argv) < 2:
+    print("Error: no arguments given")
+    sys.exit()
+
+task = sys.argv[1]
+if(task == "print"):
+    if sys.argv[2]:
+        print_file(sys.argv[2])
+    else:
+        print("ERROR: no file given")
+else:
+    print("ERROR: incrorrect command")
