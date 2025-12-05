@@ -23,3 +23,21 @@ Reading the magic number should be a good test for reading from the file
 It looks like I'll only need to read from blocks in 8 byte increments
 This means I can have another method to retrieve data at a given location in the block
 My next goal will be to read the magic number using these get block and get 8-byt methods
+
+[8:45]
+I have made my first attempt at a get_block method
+printing the result shows promising results
+I can identify the magic number, however it is offset 2 bytes from the start of the file
+I don't know the cause for this, perhaps the first 2 bytes are some kind of record keeping by windows or eLearning
+I could simply offset my file by 2 bytes to make space for these 2 bytes
+If I don't offset, I may not be able to read the index file properly
+I'll do the offset for now, and take a note to revisit this issue when testing on the CS machines
+As for the other deader fields, they look correct enough
+
+Now the next puzzle to solve is reading the rest of the blocks
+I am capable of reading blocks, the question is when to know to stop reading
+For this I think I'll look at the next block id field from the header and store it
+I'm 80% sure blocks are put in the file in increasing order
+It's not like I can open the index file in note pad and check it
+So to account for my uncertainty, I'll count how many blocks we read
+As opposed to reading the block id of the retrieved block
