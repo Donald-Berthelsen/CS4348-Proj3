@@ -27,7 +27,7 @@ My next goal will be to read the magic number using these get block and get 8-by
 [8:45]
 I have made my first attempt at a get_block method
 printing the result shows promising results
-I can identify the magic number, however it is offset 2 bytes from the start of the file
+I can identify the magic number, however it is offset 2? bytes from the start of the file
 I don't know the cause for this, perhaps the first 2 bytes are some kind of record keeping by windows or eLearning
 I could simply offset my file by 2 bytes to make space for these 2 bytes
 If I don't offset, I may not be able to read the index file properly
@@ -41,3 +41,27 @@ I'm 80% sure blocks are put in the file in increasing order
 It's not like I can open the index file in note pad and check it
 So to account for my uncertainty, I'll count how many blocks we read
 As opposed to reading the block id of the retrieved block
+
+Upon printing the first block I have encountered another issue where fields are 10 bytes long rather than 8
+I can see that the block size is 512 by using the block id field at least
+Also the magic number is still 8 bytes long, only the other fields are 10 bytes
+At this point I think I'll just make field size and offset as global variables
+I'll include some instructions in the readme if I remember for the global variables
+
+Next I'll make get_field method
+I won't use get_field on the header block since the magic number has a special offset
+
+I'm having some issues converting byte to int, maybe due to the way I read it
+This isn't too unexpected, I'm not very experienced at this
+The issue comes from reading spaces between each byte
+I'll try first removing whitespace from the read
+
+[9:55 pm]
+I have solved the problem after spending too long to realize I can simple use replace
+And have realized that the space was used to convey information
+\x00<space> is 2 bytes, \x00<no space> is only 1 byte
+So the replace has to be when decoding the bytes, not when retrieving them
+This means that the field sizes are indeed only 8 bytes, solving that problem
+I can now get rid of the field size variable
+And I can also treat the magic number as a normal field
+Meaning the next goal is get_field
