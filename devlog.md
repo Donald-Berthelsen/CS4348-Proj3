@@ -138,3 +138,27 @@ I'll have to test to see if this broke print, but things look promising
 Turns out I just got confused for a bit, but byte arrays work fine
 After also fixing a small yet significant misspelling, and I have set_field working
 Working for strings that is, now I need to make it work for ints as well
+
+[12/5/25 12:45 am]
+I finished create, or at least I think I did
+At the very least, print recognized my created file as having the magic number
+And with that, I finished all my goals for this session
+I've done everything I can without touching B-trees
+This session took slightly longer than expected
+On the other hand, I'm glad nothing here had me stuck for several hours
+I should have the bulk of the work done now
+I'm a little worried that verifying B-tree correctness will be difficult
+But that's a problem for the next session
+
+I'm hoping I can finish this project in the next session
+Then I can go clean up and comment my code
+The first step looks like it will be implementing search
+While I could implement search now using brute force it would be both slightly amusing and the incorrect solution
+Search would give tree traversal, and that would be about 1/3 the work for insert
+Another 1/3 of the work would be inserting the value itself
+This step involves only the block in memory, not the blocks in the file
+The last 1/3 of the work will be splitting the node when needed
+Splitting should be the only time I need more than 1 node in memory at a time
+And with 3 nodes in memory, it should be doable
+Then load is to insert what extract was to print, not too difficult
+I expect next session to go smoother than this one
