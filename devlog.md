@@ -65,3 +65,13 @@ This means that the field sizes are indeed only 8 bytes, solving that problem
 I can now get rid of the field size variable
 And I can also treat the magic number as a normal field
 Meaning the next goal is get_field
+
+I'll do some basic bounds checking on get_field and end the program if it fails
+This should only happen if I make a programming error
+I should be able to have get_field return the decoded int, rather than just the bytes
+All the fields are ints, and the magic number can be treated as an int as well
+
+[10:10 pm]
+Get field works, and with that I have my abstractions done
+Finishing print should be a fairly standard process from here
+I feel like I'm out of the woods and back into familiar territory
