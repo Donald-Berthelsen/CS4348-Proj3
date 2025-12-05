@@ -108,3 +108,33 @@ Next up is create, and that means being able to write to fields
 I can't use get_field directly for this, but I can reuse most of the code
 It would be good practice to also check the mode the file is open in while I do this
 While an incorrect open mode can only cause problems with bugs in the code, checks are useful to catch those bugs
+As for actually creating the file, that should be simple
+I need to create the file, then initialize the header block
+This means setting the magic number to 4348PRJ3 and the next block ID to 1
+As well as zeroing out the bytes of root ID to be safe
+The unused bits don't need to be zeroed out since they are never accessed
+
+On second thought, checking file mode presents a new range of problems I hadn't thought about before
+I can check the file mode when getting a block for reading, that works fine
+But I can't check when writing because I don't yet have the concept of writing a block
+I was going to write records based on block and field index, but that would be incorrect
+Instead I need to write to a block in memory, then move that block to the file when done
+This also has to conform to the 3 in the chamber rule
+At the current level it doesn't change much, but this make the B-tree stuff more involved
+For now, I just need to also make a set block method
+I don't need a reset block method for the same reason I don't need to zero out blocks before use
+
+But I do need to initialize my storedBlocks to support modifying them
+
+I'm having some difficulty with data types in writing to the block in memory
+I tried to initialize using a byte array, but that was causing problems
+I'll instead manually initialize the arrays with bytes
+I was thinking about it wrong, I don't need an array for each block in memory
+I only need a single variable to store the block
+
+[12:35 am]
+I got it working using a byte array that I initialize to all zeroes
+I'll have to test to see if this broke print, but things look promising
+Turns out I just got confused for a bit, but byte arrays work fine
+After also fixing a small yet significant misspelling, and I have set_field working
+Working for strings that is, now I need to make it work for ints as well
