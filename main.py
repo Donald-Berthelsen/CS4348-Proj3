@@ -15,6 +15,11 @@ def get_field(workingBlockID, index):
     return int.from_bytes(storedBlocks[workingBlockID][index: index + 8].replace(b" ", b""), byteorder = 'big', signed=False)
 
 def set_field(workingBlockID, index, value):
+    if isinstance(value, str):
+        value = value.encode('ascii')
+    elif isinstance(value, int):
+        value = int.to_bytes(value, 8, byteorder='big', signed=False)
+
     index = index * 8
     if index > 512 or index < 0:
         print("ERROR: invalid field index")
@@ -22,7 +27,6 @@ def set_field(workingBlockID, index, value):
 
     k = 0
     for i in range(index, index + 8):
-        print(value[k])
         storedBlocks[workingBlockID][i] = value[k]
         k += 1
 
@@ -40,7 +44,6 @@ def set_block(filename, blockNumber):
 
     workingFile.seek(blockNumber * 512 + offset)
 
-    print(storedBlocks[blockNumber])
     workingFile.write(storedBlocks[blockNumber])
 
     workingFile.close()
@@ -48,18 +51,13 @@ def set_block(filename, blockNumber):
 def create_file(filename):
     if os.path.exists(filename):
         print("ERROR: file already exists")
-        #sys.exit()
+        sys.exit()
 
-    set_field(0, 0, "4348PRJ3".encode('ascii'))
-    set_field(0, 1, "4348PRJ3".encode('ascii'))
-    set_field(0, 0, "4348PRJ3".encode('ascii'))
+    set_field(0, 0, "4348PRJ3")
+    set_field(0, 1, 0)
+    set_field(0, 2, 1)
 
     set_block(filename, 0)
-
-    #workingFile = open(filename, "rb")
-    #get_block(workingFile, 0, 0)
-    #print(get_field(0, 0))
-    #workingFile.close()
 
 
 def print_file(filename):
