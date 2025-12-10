@@ -198,3 +198,32 @@ By combining print_block with the print method, I have my answer
 Block ID 0 is the 7th block, and block ID 13 is the 10th
 These blocks having mismatched ID and location explain why my search algorithm couldn't find them
 At the same time, it is good to know that my search algorithm was running properly by not finding them
+
+This now leads to the question of where do I go from here
+According to the instructions, ID is determined by order in the file
+This means that ID 0 is misplaced, and ID 13 is simply invalid and should be 10
+If IDs are unordered, then there is no easy way to search for a specific ID
+So I want to believe that the test.idx file is incorrect here
+I don't want to believe the provided material is wrong, but I don't know how I would proceed otherwise
+This means I'll be going forward without an test file to work with
+It will be harder to verify correctness, but I should still be able once insert is working
+
+The next task is to do insert, and it comes in 3 parts
+First I need to find the location to insert the value
+I can do this with a modified version of search that stops at leaf nodes
+I can check if a node is a leaf if its first 2 child pointers are 0
+Next I need to shift values to the right to put in the new one
+This can be done entirely in memory using get_field and set_field
+Next is the tricky part where I need to split a node if needed, by looking at the numKeys field
+I can create a new node by looking at the next node spot in the header
+Then having both old and new nodes in memory as I fill the new node with half the old node
+The question is how I will promote the middle value
+In the worst case, I'll be promoting a node to an already full parent
+This will involve inserting in a new key/value pair, and a new pointer
+Luckily, with 3 blocks in memory I can remember the 2 child nodes and the parent node
+So I can check if the parent is full when promoting
+Then I can check the keys of the parent to know where the promoted key will go
+And from the header I know the ID of the node that will be created from the split
+Then I can set the parent IDs of the children and drop them from memory
+Then I can actually split the parent, and we can continue for however many levels needed
+Also I'll need to check if the node is the root by looking at the header
