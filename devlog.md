@@ -177,3 +177,24 @@ This will follow the assumption that blocks are stored sequentially based on ID
 Things are going fairly smoothly, just needing some bug fixes as I test it
 It would be useful to include a debug method to print blocks as they are accessed
 And it's a good thing I did so, since it shows my search had some wacky stuff going on
+
+My generic print_block method doesn't play nice with the special header block
+However since it's just a debug too, it's fine that the fields are mislabeled
+The test.idx file has an odd bit at the end of the block pointers section, no clue how it got there
+However it's outside the block size, so it shouldn't matter
+The current issue is that some value are found while others are not, this is why I made a debug method
+Search is not finding values 52-60 or 82-100, its like those blocks don't exist
+
+For 52-60, it's because they are on a block with ID 0
+I check for ID 0 as a stopping condition, but it appears that needs more refinement
+I now check if the block size is 0, however this doesn't solve the problem
+
+For the range 52-60 that fall on block 0, block 0 is the root
+This causes either an infinite loop of searching, or simply failing to find the value, depending on implementation
+printing all the values does show that these ranges do exist on the file
+The question then is where they actually are
+
+By combining print_block with the print method, I have my answer
+Block ID 0 is the 7th block, and block ID 13 is the 10th
+These blocks having mismatched ID and location explain why my search algorithm couldn't find them
+At the same time, it is good to know that my search algorithm was running properly by not finding them
