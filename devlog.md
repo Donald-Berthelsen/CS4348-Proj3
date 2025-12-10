@@ -162,3 +162,9 @@ Splitting should be the only time I need more than 1 node in memory at a time
 And with 3 nodes in memory, it should be doable
 Then load is to insert what extract was to print, not too difficult
 I expect next session to go smoother than this one
+Also adding more edge case error checking would be nice
+
+[12/10/25 2:00 pm]
+This session I plan to do the work I outlined at the end of the last session
+That being, search->insert->create
+I'm hoping I can get this done smoothly in around 2-3 hours
