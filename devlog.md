@@ -166,5 +166,14 @@ Also adding more edge case error checking would be nice
 
 [12/10/25 2:00 pm]
 This session I plan to do the work I outlined at the end of the last session
-That being, search->insert->create
+That being, search->insert->load
 I'm hoping I can get this done smoothly in around 2-3 hours
+
+First I need to do search by traversing the B-tree
+The tree will be searched using keys and child pointers, meaning I can ignore the values field
+First I'll look at the keys, then the pointers, then use that to find the next block
+This will follow the assumption that blocks are stored sequentially based on ID
+
+Things are going fairly smoothly, just needing some bug fixes as I test it
+It would be useful to include a debug method to print blocks as they are accessed
+And it's a good thing I did so, since it shows my search had some wacky stuff going on
