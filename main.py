@@ -1,4 +1,5 @@
 import os
+from re import L
 import sys
 
 offset = 2  #How far the data is from the start of the file
@@ -51,7 +52,7 @@ def print_block(memoryDest):
     print("Block Values:\t", end = '')
     for i in range(0, 18):
         print(f"{get_field(memoryDest, 3 + 19 + i)}", end = ',')
-    print(f"{get_field(memoryDest, 3 + 18 + i)}")
+    print(f"{get_field(memoryDest, 3 + 20 + i)}")
     print("Block Pointers:\t", end = '')
     for i in range(0, 19):
         print(f"{get_field(memoryDest, 3 + 19 + 19 + i)}", end = ',')
@@ -86,12 +87,15 @@ def search_file(filename, val):
 
     get_block(workingFile, 0, 0)
     nextBlock = get_field(0, 1)
+    print_block(0)
 
-    while nextBlock != 0:
-        print_block(0)
-
+    while True:
         get_block(workingFile, nextBlock, 0)
+        print_block(0)
         blockSize = get_field(0, 2)
+
+        if get_field(0, 2) == 0:
+            break
 
         if val < get_field(0, 3):
             nextBlock = get_field(0, 3 + 19 + 19)
@@ -130,6 +134,7 @@ def print_file(filename):
     totalBlocks = get_field(0, 2)
     for i in range(1, totalBlocks):
         get_block(workingFile, i, 0)
+        print_block(0)
         numKeys = get_field(0, 2)
         for k in range(1, numKeys + 1):
             print(f"{get_field(0, k + 2)},{get_field(0, k + 19 + 2)}")
