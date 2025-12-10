@@ -90,8 +90,8 @@ def search_file(filename, val):
     print_block(0)
 
     while True:
+        nextBlock = nextBlock = 1
         get_block(workingFile, nextBlock, 0)
-        print_block(0)
         blockSize = get_field(0, 2)
 
         if get_field(0, 2) == 0:
@@ -134,7 +134,6 @@ def print_file(filename):
     totalBlocks = get_field(0, 2)
     for i in range(1, totalBlocks):
         get_block(workingFile, i, 0)
-        print_block(0)
         numKeys = get_field(0, 2)
         for k in range(1, numKeys + 1):
             print(f"{get_field(0, k + 2)},{get_field(0, k + 19 + 2)}")
