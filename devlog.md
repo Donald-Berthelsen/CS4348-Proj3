@@ -295,3 +295,35 @@ Load works fine, but insertion doesn't put the values at the correct location
 Instead it is putting it at the end of the block
 Some tweaking fixed this, although I don't know why
 But it works for now, and that is good enough
+
+[11:10 pm]
+I got node splitting to work, now I just need to promote nodes
+I don't know if I'll make the deadline
+
+I have promoting to the root working
+
+I'm making good progress, but will end up with a late submission unfortunately
+
+Some more tweaking and I have normal promotions working as well
+Now all I need to do is recursive promotions
+
+[12:10 pm]
+I missed the deadline unfortunately
+At least this gives me an excuse to write a simple script to generate a large csv
+And include more methods for debugging
+
+A difficulty of testing recursive promotions is just how many values I need to work with
+This is because the problem only occurs when the root is split for the second time
+In order to split the root twice requires a large csv file
+Another difficulty is just how many fields I'm accessing to perform the operation
+
+I'm getting confused so I'll try a fresh start for promotion
+
+[1:15 am]
+I have discovered why my insertion stopped working
+I was getting the wrong field to check if the tree was still just the root
+This was sneakily causing a lot of problems since it would prevent updating the header
+
+That's one problem solved, there are still more
+For example, there are insertions not from the csv that break ordering within nodes
+I don't know where they come from, but that is another problem to solve
