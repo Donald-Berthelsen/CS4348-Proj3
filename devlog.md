@@ -227,3 +227,56 @@ And from the header I know the ID of the node that will be created from the spli
 Then I can set the parent IDs of the children and drop them from memory
 Then I can actually split the parent, and we can continue for however many levels needed
 Also I'll need to check if the node is the root by looking at the header
+
+I'll have to make sure to test all my methods a second time before submission with how much I edit them
+This will come from testing on the CS machines
+
+I should have the basic non split case for insert done
+I don't need to explicitly make the initial root node since it has block ID 0 and 0 keys to start
+
+Looks like set_field doesn't play nice with blocks I obtain from get_block
+This likely comes from differences in datatypes between initialized and found blocks
+The problem stems from trying to read a block that doesn't exist
+
+I solved the problem by manually setting the value in memory if a read turns up empty
+While not the most elegant solution, it works for this case
+Now I'm having issues with set_block overwriting the header
+I suspect this is from seek not being valid to set where to write
+
+I solved this problem by changing the mode I use to open the file
+Now the issue is actually inserting the key/value
+Incrementing block size works fine, it's the other values that are a problem
+It doesn't help that the workflow to check changes is delete file->creat->insert->print
+At least print_block let me get rid of the last print step
+
+The blocks in memory are of proper format now after some tweaking
+Now the issue is they don't get written to the file properly
+At least it no longer is interfering with the header block
+
+Print is not working because I don't increment the next block ID when making the root
+This again runs into the issue of reading the file in a different data type than I write to it
+I'll have to solve this issue to progress
+
+The root of my problems was that the byte object is immutable
+By simply reading blocks as bytearrays, my problems are solved
+Except for print not working anymore, but basic insertion is good now
+And search works too now with my inserted values, yippee
+And I can fix the print error with a minor tweak
+
+[12/10/25 6:00 pm]
+I'm calling the second session here due to a prior commitment
+I did not accomplish my goal of completing the project, so I will need to do a third session
+I may end up cutting it tight on time
+This means I may not clean the code or test it on the CS machines
+This session had some unexpected roadblocks, but now I am over them
+The roadblocks came from an incorrect foundation from stuff I did in the last session
+So going forwards I should have a more solid foundation to prevent future roadblocks
+
+Next session I need to finish the project, and there will be a somewhat tight time constraint
+First I'll do load to help with future testing for insertion
+Load should be simple to do
+I'll also make a modified load that will create a fresh file to load into to help test
+Then it'll be splitting nodes for insert, then promoting values
+If things go smoothly the remaining work shouldn't take too long
+However judging by how this session went, I'm not sure that will be the case
+Regardless, I have a clear idea of what remains to be done and now I just need to follow through
