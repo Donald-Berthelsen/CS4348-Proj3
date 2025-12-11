@@ -110,8 +110,8 @@ def insert_into(filename, key, val):
         get_block(workingFile, nextBlock + 1, 0)
         blockSize = get_field(0, 2)
 
-        if key == 4774:
-            print_block(0)
+        #if key == 2375:
+        #    print_block(0)
 
         if get_field(0, 3 + 19 + 19) == get_field(0, 3 + 19 + 19 + 1):
             break
@@ -161,7 +161,7 @@ def split_node(filename, key, value, newRoot = False, pointer = 0):
     set_field(1, 1, get_field(0, 1))
     set_field(1, 2, 10)
     set_field(0, 2, 9)
-    
+
     midVal = get_field(0, 2 + 10)
     if key >= midVal:
         k = 0
@@ -171,28 +171,25 @@ def split_node(filename, key, value, newRoot = False, pointer = 0):
                 set_field(0, 3 + 19 - i + k, 0)
                 set_field(1, 13 + 19 - i, get_field(0, 3 + 19 + 19 - i + k))
                 set_field(0, 3 + 19 + 19 - i + k, 0)
-                #if newRoot:
-                #    print(get_field(0, 3 + 19 + 19 + 20 - i + k))
-                set_field(1, 13 + 19 + 19 - i, get_field(0, 3 + 19 + 19 + 20 - i + k))
+                set_field(1, 13 + 19 + 20 - i, get_field(0, 3 + 19 + 19 + 20 - i + k))
                 set_field(0, 3 + 19 + 19 + 20 - i + k, 0)
             else:
-                #if(newRoot):
-                #    print(f"\n\n{key}\n\n\n\n\n{pointer}\n\n\n\n")
                 set_field(1, 13 - i, key)
                 set_field(1, 13 + 19 - i, value)
-                set_field(1, 13 + 19 + 19 - i, pointer)
+                set_field(1, 13 + 19 + 20 - i, pointer)
                 k = 1
-            #if newRoot:
-                #print_block(0)
-                #print_block(1)
+        set_field(1, 13 + 19 + 20 - 11, get_field(0, 3 + 19 + 19 + 20 - 11 + k))
+        set_field(0, 3 + 19 + 19 + 20 - 11 + k, 0)
     else:
         for i in range(1, 11):
             set_field(1, 13 - i, get_field(0, 3 + 19 - i))
             set_field(0, 3 + 19 - i, 0)
             set_field(1, 13 + 19 - i, get_field(0, 3 + 19 + 19 - i))
             set_field(0, 3 + 19 + 19 - i, 0)
-            set_field(1, 13 + 19 + 19 - i, get_field(0, 3 + 19 + 19 + 20 - i))
+            set_field(1, 13 + 19 + 20 - i, get_field(0, 3 + 19 + 19 + 20 - i))
             set_field(0, 3 + 19 + 19 + 20 - i, 0)
+        set_field(1, 13 + 19 + 20 - 11, get_field(0, 3 + 19 + 19 + 20 - 11))
+        set_field(0, 3 + 19 + 19 + 20 - 11, 0)
 
         for i in reversed(range(0, 10)):
             if get_field(0, 2 + i) > key:
@@ -211,7 +208,7 @@ def split_node(filename, key, value, newRoot = False, pointer = 0):
 
     set_field(0, 12, 0)
     set_field(0, 2 + 19 + 10, 0)
-    #if newRoot:
+    #if(get_field(0, 5 + 19 + 19) != 0):
     #    print_block(0)
     #    print_block(1)
     set_block(filename, get_field(0, 0) + 1, 0)
@@ -262,15 +259,16 @@ def promote_key(filename, key, value, expandingDepth):
             file.close()
             set_block(filename, get_field(0, 1) + 1, 2)
         else:
-            ID = get_field(2, 0)
+            parID = get_field(2, 1)
+            get_block(file, get_field(2, 0) + 1, 0)
             get_block(file, 0, 2)
-            get_block(file, ID + 1, 0)
+            ID = get_field(2, 2)
             file.close()
-            print_block(0)
-            if ID == get_field(2, 1):
-                split_node(filename, key, value, True, ID)
+            if parID == 0:
+                split_node(filename, key, value, True, ID - 1)
             else:
-                split_node(filename, key, value, False, ID)
+                print("B")
+                split_node(filename, key, value, False, ID - 1)
 
 def search_file(filename, val):
     try:
