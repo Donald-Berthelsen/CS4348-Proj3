@@ -341,3 +341,28 @@ Split is the one putting the values on the file, not insert
 [2:15 am]
 One tweak latter and I can actually insert values into children of the root
 Now I can try to find the source of the shadow inserts
+Also, it looks like values at the middle of the swap don't go on the correct sides
+
+The shadow numbers appear to be spawned by the way I shift the nodes to insert new values
+The shadow numbers replace a regular insertion with that value
+The problem stems from my set_field function
+It is not converting from decimal to hex properly, the to_bytes function to be exact
+Once a value passes ~5000, it no longer displays properly
+While python can decode this value just fine still, it loses some context when I store it to memory
+Without that context, python no longer knows how to read the bytes and thus gives a wrong answer
+It's a good thing I'm testing with large enough values, otherwise I wouldn't have caught this
+
+I can't determine why this happens, although I have found it to be a property of Python
+The solution is to convert the bytes to hex when using them since that doesn't get messed up
+However this involves rewriting my foundation methods again
+Hopefully not too much breaks
+
+[3:10 am]
+Bytes are represented not as hex, but as ASCII
+This causes the problematic bytes to display as a space
+However spaces in byte form have meaning
+This meaning gets confused and we lose the value we were storing, that is the root of the problem
+This is because I remove the spaces from bytes when I retrieve them
+I forgot the original motivation behind removing spaces, but I was able to safely undo it
+And with just a minor change, this goose hunt come to an end
+Next up is fixing the middle values of swaps
