@@ -131,7 +131,8 @@ def insert_into(filename, key, val):
     if blockSize < 19:
         set_field(0, 2, get_field(0, 2) + 1)
         for i in reversed(range(0, blockSize + 1)):
-            if get_field(0, 3 + i) > key:
+            print(get_field(0, 2 + i))
+            if get_field(0, 2 + i) > key:
                 set_field(0, 3 + i, get_field(0, 3 + i - 1))
                 set_field(0, 3 + 19 + i, get_field(0, 3 + 19 + i - 1))
             else:
@@ -190,6 +191,25 @@ def search_file(filename, val):
     print(f"ERROR: unable to find index {val} in file {filename}")
     workingFile.close()
 
+def load_file(indexFileName, csvFileName):
+    try:
+        workingcsvFile = open(csvFileName, "r")
+    except FileNotFoundError:
+        print("ERROR: csv file not found")
+        sys.exit()
+
+    text = workingcsvFile.read()
+
+    keys, vals = [], []
+    for line in text.split('\n'):
+        column_list = line.split(',')
+        keys.append(column_list[0])
+        vals.append(column_list[1])
+
+    for i in range(0, len(keys)):
+        insert_into(indexFileName, int(keys[i]), int(vals[i]))
+
+
 def print_file(filename):
     try:
         workingFile = open(filename, "rb")
@@ -207,6 +227,7 @@ def print_file(filename):
     totalBlocks = get_field(0, 2)
     for i in range(1, totalBlocks + 1):
         get_block(workingFile, i, 0)
+        print_block(0)
         numKeys = get_field(0, 2)
         for k in range(1, numKeys + 1):
             print(f"{get_field(0, k + 2)},{get_field(0, k + 19 + 2)}")
@@ -282,6 +303,13 @@ elif task == "search":
             print("ERROR: index must be unsigned integer")
         else:
             search_file(sys.argv[2], int(sys.argv[3]))
+elif task == "load":
+    if len(sys.argv) < 3:
+        print("ERROR: no index file given")
+    elif len(sys.argv) < 4:
+        print("ERROR: no csv file given")
+    else:
+        load_file(sys.argv[2], sys.argv[3])
 elif task == "print":
     if len(sys.argv) > 2:
         print_file(sys.argv[2])
