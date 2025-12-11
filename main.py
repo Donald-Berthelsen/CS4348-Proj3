@@ -76,7 +76,7 @@ def create_file(filename):
 
     set_field(0, 0, "4348PRJ3")
     set_field(0, 1, 0)
-    set_field(0, 2, 1)
+    set_field(0, 2, 0)
 
     workingFile = open(filename, "wb")
 
@@ -101,24 +101,24 @@ def insert_into(filename, key, val):
         workingFile.close()
         sys.exit()
 
-    nextBlock = get_field(0, 2)
-    if nextBlock == 1:
+    nextBlock = get_field(0, 1)
+    if nextBlock == 0 and get_field(0, 2) == 0:
         set_field(0, 2, 1)
         set_block(filename, 0, 0)
 
     while True:
-        get_block(workingFile, nextBlock, 0)
+        get_block(workingFile, nextBlock + 1, 0)
         blockSize = get_field(0, 2)
 
         if get_field(0, 3 + 19 + 19) == get_field(0, 3 + 19 + 19 + 1):
             break
 
         if key <= get_field(0, 3):
-            nextBlock = get_field(0, 3 + 19 + 19) + 1
+            nextBlock = get_field(0, 3 + 19 + 19)
             continue
 
         if key >= get_field(0, 2 + blockSize):
-            nextBlock = get_field(0, 3 + 19 + 19 + blockSize) + 1
+            nextBlock = get_field(0, 3 + 19 + 19 + blockSize)
             continue
 
         for i in range(0, blockSize):
@@ -126,7 +126,7 @@ def insert_into(filename, key, val):
             
             if i < blockSize:
                 if key >= workingKey and key <= get_field(0, i + 1 + 3):
-                    nextBlock = get_field(0, 3 + 19 + 19 + i + 1) + 1
+                    nextBlock = get_field(0, 3 + 19 + 19 + i + 1)
                     break
     if blockSize < 19:
         set_field(0, 2, get_field(0, 2) + 1)
@@ -140,11 +140,11 @@ def insert_into(filename, key, val):
                 break
 
         workingFile.close()
-        set_block(filename, nextBlock, 0)
+        set_block(filename, nextBlock + 1, 0)
         
     else:
         workingFile.close()
-        #split_node(filename, key, val)
+        split_node(filename, key, val)
 
 def split_node(filename, key, value):
     file = open(filename, "rb")
@@ -198,12 +198,13 @@ def split_node(filename, key, value):
     set_block(filename, get_field(1, 0) + 1, 1)
 
     file.close()
-    promote_key(filename, midKey, midVal)
+    expandingDepth = get_field(2, 1) == 0
+    promote_key(filename, midKey, midVal, expandingDepth)
 
-def promote_key(filename, key, value):
+def promote_key(filename, key, value, expandingDepth):
     file = open(filename, "rb")
 
-    if get_field(2, 1) == get_field(0, 1):
+    if expandingDepth:
         get_block(file, 0, 2)
         set_field(2, 1, get_field(2, 2))
         ID = get_field(2, 2)
@@ -240,6 +241,8 @@ def promote_key(filename, key, value):
                     break
             file.close()
             set_block(filename, get_field(0, 1) + 1, 2)
+        else:
+            print("BAD BAD BAD")
 
 
     """
