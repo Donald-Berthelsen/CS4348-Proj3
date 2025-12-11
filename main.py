@@ -13,7 +13,7 @@ def get_field(workingBlockID, index):
         print("ERROR: invalid field index")
         sys.exit()
 
-    return int.from_bytes(storedBlocks[workingBlockID][index: index + 8].replace(b" ", b""), byteorder = 'big', signed=False)
+    return int.from_bytes(storedBlocks[workingBlockID][index: index + 8], byteorder = 'big', signed=False)
 
 def set_field(workingBlockID, index, value):
     if isinstance(value, str):
@@ -128,7 +128,6 @@ def insert_into(filename, key, val):
                 if key >= workingKey and key <= get_field(0, i + 1 + 3):
                     nextBlock = get_field(0, 3 + 19 + 19 + i + 1) + 1
                     break
-    
     if blockSize < 19:
         set_field(0, 2, get_field(0, 2) + 1)
         for i in reversed(range(0, blockSize + 1)):
@@ -145,7 +144,7 @@ def insert_into(filename, key, val):
         
     else:
         workingFile.close()
-        split_node(filename, key, val)
+        #split_node(filename, key, val)
 
 def split_node(filename, key, value):
     file = open(filename, "rb")
