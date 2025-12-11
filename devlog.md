@@ -327,3 +327,17 @@ This was sneakily causing a lot of problems since it would prevent updating the 
 That's one problem solved, there are still more
 For example, there are insertions not from the csv that break ordering within nodes
 I don't know where they come from, but that is another problem to solve
+
+I'm slowly reimplementing functionality as things work
+The new problem is that blocks are forgetting the parent ID assigned to them
+So now it's another witch hunt to try to find where it is being overridden
+And that witch hunt has uncovered some very odd behavior
+Block ID 0 is getting all the insertions, and once full it flushes itself
+And there still are the shadow inserts that aren't on the csv
+Now I'm confused how this even is working for the first promotion
+Wherever the values are getting inserted, it sure isn't the first block
+Split is the one putting the values on the file, not insert
+
+[2:15 am]
+One tweak latter and I can actually insert values into children of the root
+Now I can try to find the source of the shadow inserts
