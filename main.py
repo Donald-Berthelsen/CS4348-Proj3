@@ -110,9 +110,6 @@ def insert_into(filename, key, val):
         get_block(workingFile, nextBlock + 1, 0)
         blockSize = get_field(0, 2)
 
-        #if key == 2375:
-        #    print_block(0)
-
         if get_field(0, 3 + 19 + 19) == get_field(0, 3 + 19 + 19 + 1):
             break
 
@@ -208,9 +205,15 @@ def split_node(filename, key, value, newRoot = False, pointer = 0):
 
     set_field(0, 12, 0)
     set_field(0, 2 + 19 + 10, 0)
-    #if(get_field(0, 5 + 19 + 19) != 0):
-    #    print_block(0)
-    #    print_block(1)
+
+    if get_field(0, 4 + 19 + 19) != 0:
+        for i in range(0, 11):
+            thisID = get_field(1, 0)
+            get_block(file, get_field(1, 3 + 19 + 19 + i) + 1, 2)
+            set_field(2, 1, thisID)
+            set_block(filename, get_field(1, 3 + 19 + 19 + i) + 1, 2)
+        get_block(file, 0, 2)
+
     set_block(filename, get_field(0, 0) + 1, 0)
     set_block(filename, get_field(1, 0) + 1, 1)
 
@@ -267,7 +270,6 @@ def promote_key(filename, key, value, expandingDepth):
             if parID == 0:
                 split_node(filename, key, value, True, ID - 1)
             else:
-                print("B")
                 split_node(filename, key, value, False, ID - 1)
 
 def search_file(filename, val):
