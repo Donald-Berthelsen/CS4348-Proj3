@@ -280,3 +280,18 @@ Then it'll be splitting nodes for insert, then promoting values
 If things go smoothly the remaining work shouldn't take too long
 However judging by how this session went, I'm not sure that will be the case
 Regardless, I have a clear idea of what remains to be done and now I just need to follow through
+
+[12/10/25 9:45 pm]
+I am now beginning session 3 with roughly 2 hours left to finish the project
+If things go smoothly this will be enough time
+In the interest of saving time, I'll be making less frequent commits
+The current goal is full functionality, extra things can come after that
+
+First I need to implement load, this should be simple enough 
+As it happens, I have code for reading a csv from my databases project
+I should be able to use this 
+
+Load works fine, but insertion doesn't put the values at the correct location
+Instead it is putting it at the end of the block
+Some tweaking fixed this, although I don't know why
+But it works for now, and that is good enough
