@@ -391,3 +391,29 @@ But if I look at the root ID, now it tries to insert into the header
 By moving around how I traverse the tree I was able to resolve this
 This may become a problem for search
 Luckily now that I missed the deadline, I have plenty of time to test on the CS machines
+
+After testing a csv with 200 rows, I can somewhat confidently say that promotion works
+Now the final task is to have recursive promotions
+I may be able to utilize split_node for this
+
+Recursive promotion is somewhat working, some keys are sneaking into the wrong blocks
+It looks like internal nodes suffer from not respecting the roots pointers
+Also node 0 forgets some values and sometimes doesn't respect its parent
+Also one lead node looks like it was accepting 2 separate ranges
+But other than those issues, recursive promotion worked
+
+I'll start by solving node 0 since it should only have to do with the split algorithm
+Node 0 has the smallest values of the tree due to how it is structured
+It seems it has difficulty when the values get too small
+
+Small keys are instead replaced by the size of the block, and the related value is lost
+I don't know what came together to cause this
+
+[5:00 am]
+I have solved the problem of using the block size as a key
+When shifting the keys, the stopping condition was the first number smaller than the key
+It just so happened that this also was checking the block size
+And for the vast majority of values I use, they are larger than the block size
+But for block 0 specifically, there was a chance that it would have a value smaller than the block size
+This is because the smallest values in the B-tree go on block 0
+This was solved with a simple check on if we reached the block size field so we can stop before it
