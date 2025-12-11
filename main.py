@@ -147,6 +147,9 @@ def insert_into(filename, key, val):
         split_node(filename, key, val)
 
 def split_node(filename, key, value, newRoot = False, pointer = 0):
+    if get_field(0, 0) == 0:
+        print_block(0)
+        print(key)
     file = open(filename, "rb")
     get_block(file, 0, 2)
     newID = get_field(2, 2)
@@ -189,7 +192,7 @@ def split_node(filename, key, value, newRoot = False, pointer = 0):
         set_field(0, 3 + 19 + 19 + 20 - 11, 0)
 
         for i in reversed(range(0, 10)):
-            if get_field(0, 2 + i) > key:
+            if get_field(0, 2 + i) > key and i != 0:
                 set_field(0, 3 + i, get_field(0, 3 + i - 1))
                 set_field(0, 3 + 19 + i, get_field(0, 3 + 19 + i - 1))
                 set_field(0, 3 + 19 + 19 + i, get_field(0, 3 + 19 + 19 + i - 1))
@@ -205,6 +208,10 @@ def split_node(filename, key, value, newRoot = False, pointer = 0):
 
     set_field(0, 12, 0)
     set_field(0, 2 + 19 + 10, 0)
+
+    if get_field(0, 0) == 0:
+        print_block(0)
+        print_block(1)
 
     if get_field(0, 4 + 19 + 19) != 0:
         for i in range(0, 11):
