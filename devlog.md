@@ -450,3 +450,19 @@ Fixing my new vs old root detection again and now that problem is solved
 Now all my leaf nodes follow a nice tight ordered range of values
 Granted, the internal nodes still have some keys that they shouldn't have
 That means tracking down the source of those keys, just like I did for the leaves
+
+After a while of searching, I found this to be a case of the parent ID not being tracked properly
+When I split a parent node, I need to update the parent ID of its children
+
+[8:30 am]
+My insert algorithm is not very robust
+Changing a single line has a moderate possibility of breaking it
+But after finagling with it I finally have a mostly correct B-tree
+Updating parent ID was the last step for ironing out the bugs
+
+Now I can scale my input csv to 1000 entries, and I found the B-tree to be mostly functional
+The bug with small items dropping the value has resurfaced, but everything else seems to work fine
+I believe that now I can scale up the B-tree arbitrarily large and it will still be correct
+The problem with testing that however, is how long it takes to go through all the entries to check them
+It would be possible to output to a file then use tools there, but that is more commitment than I'm willing to do
+Furthermore, I only have around 3 hours until I fall down a late work bracket
