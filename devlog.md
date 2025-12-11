@@ -472,3 +472,49 @@ Rather, a shadow key is getting created during the splitting process
 This is the exact same issue as before
 This was caused by me doing 2 versions of split depending on where in incoming value was
 While I fixed one version, the other version still had the bug
+
+For a sanity check I counted the number of keys using block size
+Thankfully the value was correct, it would have been problematic this late in the game
+Next I'll try some stress tests of 10000 and 100000 size csvs
+The potential pitfalls with this are the difficulty to read as mentioned before
+As well as having a noticeable computational and time cost
+In fact, after seeing the 10000, I think I'll pass on the 100000
+It doesn't even fit in the console, this wasn't a very productive stress test
+
+Going back to testing my other functions, search freezes when it can't find the value
+Errors like this weren't completely unexpected, given how much I changed during insertion
+The error comes from an infinite loop of seeing block 0 as having a pointer to itself
+This is solved by checking if we are in a loop
+
+The next issue is that search fails to find some keys
+I suspect this is because it begins the search on node 0, rather than the root
+The bigger issue was actually some stuff I broke when fixing the infinite loop
+
+Going through more functions, it some data is lost during extract
+The cause was accidentally excluding the last block, good thing I checked
+
+[12/11/25 9:45 am]
+With this I can say I am done with the functional components of the project
+I still have comments and the readme to do, but those are much more relaxed
+
+I have decided not to clean up my code because it's so easy to break it
+And I don't want to have to go through testing everything again
+Not to mention I'm working with a finite amount of time until the late penalty gets worse
+Instead I'll try to make up for it with comments
+Also my code is fairly suboptimal in how often I transfer between the file and memory
+The idea was I could be a bit lax around promoting keys since it was an uncommon occurrence
+However that was a somewhat false assumption when actually put into practice
+My device was taking some time for loading larger csvs, and I wonder how much was due to my implementation
+
+I spent some time on supporting activities this project, and they helped by a noticeable amount
+It was convenient to be able to generate a random csv and then load and print it in one action
+Being able to view blocks was also helpful, even if it did have me chasing a false bug
+
+This project was significantly harder than I expected, and I would not be surprised if it was because of my approach
+I'm sure there are plenty of preexisting algorithms to implement B-trees that would perform better than mine
+I ended up taking a lot of time to debug insertion, and a lot of them were simple one line fixes
+My approach was error prone with how many values are effectively hard coded in, such as block size
+I also lost some time to not understanding mechanics, such as how Python handles bytes
+
+Structured data blocks are fun to work with once the access methods are created
+They are conceptually really useful, although I had to revisit my implementation several times due to bugs
