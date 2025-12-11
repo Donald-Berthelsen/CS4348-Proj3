@@ -1,11 +1,10 @@
 import os
-from re import L
 import sys
 
 offset = 2  #How far the data is from the start of the file
 storedBlocks = [bytearray(b'\x00' * 512), bytearray(b'\x00' * 512), bytearray(b'\x00' * 512)]
 magicNumber = int.from_bytes("4348PRJ3".encode('ascii'), byteorder = 'big', signed=False)
-
+keyCount = 0
 
 def get_field(workingBlockID, index):
     index = index * 8
@@ -46,6 +45,8 @@ def print_block(memoryDest):
     print(f"Block ID: {get_field(memoryDest, 0)}")
     print(f"Block Parent ID: {get_field(memoryDest, 1)}")
     print(f"Block Size: {get_field(memoryDest, 2)}")
+    global keyCount
+    keyCount = keyCount + get_field(memoryDest, 2) 
     print("Block Keys:\t", end = '')
     for i in range(0, 18):
         print(f"{get_field(memoryDest, 3 + i)}", end = ',')
@@ -69,10 +70,9 @@ def set_block(filename, blockNumber, memNumber):
     workingFile.close()
 
 def create_file(filename):
-    print("UNCOMMENT THIS")
-    #if os.path.exists(filename):
-    #    print("ERROR: file already exists")
-    #    sys.exit()
+    if os.path.exists(filename):
+        print("ERROR: file already exists")
+        sys.exit()
 
     set_field(0, 0, "4348PRJ3")
     set_field(0, 1, 0)
@@ -147,9 +147,6 @@ def insert_into(filename, key, val):
         split_node(filename, key, val)
 
 def split_node(filename, key, value, newRoot = False, pointer = 0):
-    if get_field(0, 0) == 0:
-        print_block(0)
-        print(key)
     file = open(filename, "rb")
     get_block(file, 0, 2)
     newID = get_field(2, 2)
@@ -208,10 +205,6 @@ def split_node(filename, key, value, newRoot = False, pointer = 0):
 
     set_field(0, 12, 0)
     set_field(0, 2 + 19 + 10, 0)
-
-    if get_field(0, 0) == 0:
-        print_block(0)
-        print_block(1)
 
     if get_field(0, 4 + 19 + 19) != 0:
         for i in range(0, 11):
@@ -295,19 +288,21 @@ def search_file(filename, val):
     nextBlock = get_field(0, 1)
 
     while True:
-        nextBlock = nextBlock + 1
-        get_block(workingFile, nextBlock, 0)
+        get_block(workingFile, nextBlock + 1, 0)
         blockSize = get_field(0, 2)
-
         if get_field(0, 2) == 0:
             break
 
         if val < get_field(0, 3):
             nextBlock = get_field(0, 3 + 19 + 19)
+            if nextBlock == get_field(0, 0):
+                break
             continue
 
         if val > get_field(0, 2 + blockSize):
             nextBlock = get_field(0, 3 + 19 + 19 + blockSize)
+            if nextBlock == get_field(0, 0):
+                break
             continue
 
         for i in range(0, blockSize):
@@ -321,14 +316,13 @@ def search_file(filename, val):
                 if val > workingKey and val < get_field(0, i + 1 + 3):
                     nextBlock = get_field(0, 3 + 19 + 19 + i + 1)
                     break
+        if nextBlock == get_field(0, 0):
+            break
 
     print(f"ERROR: unable to find index {val} in file {filename}")
     workingFile.close()
 
 def load_file(indexFileName, csvFileName):
-    create_file(indexFileName)
-    print("DELETE THIS")
-
     try:
         workingcsvFile = open(csvFileName, "r")
     except FileNotFoundError:
@@ -346,8 +340,6 @@ def load_file(indexFileName, csvFileName):
     for i in range(0, len(keys)):
         insert_into(indexFileName, int(keys[i]), int(vals[i]))
 
-    print_file(indexFileName)
-
 
 def print_file(filename):
     try:
@@ -357,7 +349,6 @@ def print_file(filename):
         sys.exit()
 
     get_block(workingFile, 0, 0)
-    print_block(0)
     if(get_field(0, 0) != magicNumber):
         print("ERROR: improper file format")
         workingFile.close()
@@ -366,7 +357,6 @@ def print_file(filename):
     totalBlocks = get_field(0, 2)
     for i in range(1, totalBlocks + 1):
         get_block(workingFile, i, 0)
-        print_block(0)
         numKeys = get_field(0, 2)
         for k in range(1, numKeys + 1):
             print(f"{get_field(0, k + 2)},{get_field(0, k + 19 + 2)}")
@@ -393,7 +383,7 @@ def extract_file(sourceFileName, destFileName):
     destFile = open(destFileName, "w")
 
     totalBlocks = get_field(0, 2)
-    for i in range(1, totalBlocks):
+    for i in range(1, totalBlocks + 1):
         get_block(sourceFile, i, 0)
         numKeys = get_field(0, 2)
         for k in range(1, numKeys + 1):
@@ -463,3 +453,5 @@ elif task == "extract":
         extract_file(sys.argv[2], sys.argv[3])
 else:
     print("ERROR: incrorrect command")
+
+#print(keyCount)
