@@ -366,3 +366,28 @@ This is because I remove the spaces from bytes when I retrieve them
 I forgot the original motivation behind removing spaces, but I was able to safely undo it
 And with just a minor change, this goose hunt come to an end
 Next up is fixing the middle values of swaps
+
+Yet when I reintroduced promotion, the middle values were already correct
+This means I can finally go on to working on features again
+
+The current issue is that my condition for creating a new root is flawed
+The question I need to solve is how I will know that a promotion is going to create a new root
+Rather, how do I differentiate an existing root from a newly created one
+The clunky solution is to use a flag for this
+I have a special case for the first new root creation
+Then set the flag as needed when promoting
+
+With that flag, I now have the ability to promote multiple nodes to the root
+The problem now is that it's not picking the correct nodes
+Only the first promotion actually creates a parent that follows the B-tree structure
+The splitting itself looks fine
+The issue is once again data being overwritten somewhere
+
+The actual issue is that insertions ignore the root after the second split
+Instead they insert directly into the latest block
+Because I'm looking at the header's next ID, rather than root ID
+But if I look at the root ID, now it tries to insert into the header
+
+By moving around how I traverse the tree I was able to resolve this
+This may become a problem for search
+Luckily now that I missed the deadline, I have plenty of time to test on the CS machines
