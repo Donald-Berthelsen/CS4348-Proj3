@@ -69,9 +69,10 @@ def set_block(filename, blockNumber, memNumber):
     workingFile.close()
 
 def create_file(filename):
-    if os.path.exists(filename):
-        print("ERROR: file already exists")
-        sys.exit()
+    print("UNCOMMENT THIS")
+    #if os.path.exists(filename):
+    #    print("ERROR: file already exists")
+    #    sys.exit()
 
     set_field(0, 0, "4348PRJ3")
     set_field(0, 1, 0)
@@ -131,7 +132,6 @@ def insert_into(filename, key, val):
     if blockSize < 19:
         set_field(0, 2, get_field(0, 2) + 1)
         for i in reversed(range(0, blockSize + 1)):
-            print(get_field(0, 2 + i))
             if get_field(0, 2 + i) > key:
                 set_field(0, 3 + i, get_field(0, 3 + i - 1))
                 set_field(0, 3 + 19 + i, get_field(0, 3 + 19 + i - 1))
@@ -142,8 +142,166 @@ def insert_into(filename, key, val):
 
         workingFile.close()
         set_block(filename, nextBlock, 0)
+    else:
+        workingFile.close()
+        split_node(filename, key, val)
 
+def split_node(filename, key, value):
+    file = open(filename, "rb")
+    get_block(file, 0, 2)
+    newID = get_field(2, 2)
+    set_field(2, 2, newID + 1)
+    set_block(filename, 0, 2)
+    storedBlocks[1] = bytearray(b'\x00' * 512)
 
+    set_field(1, 0, newID)
+    set_field(1, 1, get_field(0, 1))
+    set_field(1, 2, 10)
+    set_field(0, 2, 9)
+    
+    midVal = get_field(0, 2 + 10)
+    if key >= midVal:
+        k = 0
+        for i in range(1, 11):
+            if get_field(0, 22 - i) > key or k == 1:
+                set_field(1, 13 - i, get_field(0, 3 + 19 - i + k))
+                set_field(0, 3 + 19 - i + k, 0)
+                set_field(1, 13 + 19 - i, get_field(0, 3 + 19 + 19 - i + k))
+                set_field(0, 3 + 19 + 19 - i + k, 0)
+            else:
+                set_field(1, 13 - i, key)
+                set_field(1, 13 + 19 - i, value)
+                k = 1
+    else:
+        for i in range(1, 11):
+            set_field(1, 13 - i, get_field(0, 3 + 19 - i))
+            set_field(0, 3 + 19 - i, 0)
+            set_field(1, 13 + 19 - i, get_field(0, 3 + 19 + 19 - i))
+            set_field(0, 3 + 19 + 19 - i, 0)
+
+        for i in reversed(range(0, 10)):
+            if get_field(0, 2 + i) > key:
+                set_field(0, 3 + i, get_field(0, 3 + i - 1))
+                set_field(0, 3 + 19 + i, get_field(0, 3 + 19 + i - 1))
+            else:
+                set_field(0, 3 + i, key)
+                set_field(0, 3 + 19 + i, value)
+                break
+
+    midKey = get_field(0, 2 + 10)
+    midVal = get_field(0, 2 + 19 + 10)
+
+    set_field(0, 12, 0)
+    set_field(0, 2 + 19 + 10, 0)
+
+    set_block(filename, get_field(0, 0) + 1, 0)
+    set_block(filename, get_field(1, 0) + 1, 1)
+
+    file.close()
+    promote_key(filename, midKey, midVal)
+
+def promote_key(filename, key, value):
+    file = open(filename, "rb")
+
+    if get_field(2, 1) == get_field(0, 1):
+        print("ALKSJAKLJSKJAHSKJH")
+        set_field(2, 1, get_field(2, 2))
+        ID = get_field(2, 2)
+        set_field(0, 1, ID)
+        set_field(1, 1, ID)
+        set_block(filename, get_field(0, 0) + 1, 0)
+        set_block(filename, get_field(1, 0) + 1, 1)
+        set_field(2, 2, ID + 1)
+        set_block(filename, 0, 2)
+        storedBlocks[2] = bytearray(b'\x00' * 512)
+
+        set_field(2, 0, ID)
+        set_field(2, 2, 1)
+        set_field(2, 3, key)
+        set_field(2, 3 + 19, value)
+        set_field(2, 3 + 19 + 19, get_field(0, 0))
+        set_field(2, 3 + 19 + 19 + 1, get_field(1, 0))
+        file.close()
+        set_block(filename, ID + 1, 2)
+    else:
+        get_block(file, get_field(2, 1) + 1, 2)
+        blockSize = get_field(2, 2)
+        if blockSize < 19:
+            set_field(2, 2, get_field(2, 2) + 1)
+            for i in reversed(range(0, blockSize + 1)):
+                if get_field(2, 2 + i) > key:
+                    set_field(2, 3 + i, get_field(2, 3 + i - 1))
+                    set_field(2, 3 + 19 + i, get_field(2, 3 + 19 + i - 1))
+                    set_field(2, 3 + 19 + 20 + i, get_field(2, 3 + 19 + 20 + i - 1))
+                else:
+                    set_field(2, 3 + i, key)
+                    set_field(2, 3 + 19 + i, value)
+                    set_field(2, 3 + 19 + 20 + i, get_field(1, 0))
+                    break
+            file.close()
+            set_block(filename, get_field(2, 0) + 1, 2)
+        else:
+            workingID = get_field(1, 0)
+
+            storedBlocks[0] = storedBlocks[2]
+            storedBlocks[1] = bytearray(b'\x00' * 512)
+
+            get_block(file, 0, 2)
+            newID = get_field(2, 2)
+            set_field(2, 2, newID + 1)
+            set_block(filename, 0, 2)
+
+            set_field(1, 0, newID)
+            set_field(1, 1, get_field(0, 1))
+            set_field(1, 2, 10)
+            set_field(0, 2, 9)
+
+            midVal = get_field(2, 2 + 10)
+            if key >= midVal:
+                k = 0
+                for i in range(1, 11):
+                    if get_field(0, 22 - i) > key or k == 1:
+                        set_field(1, 13 - i, get_field(0, 3 + 19 - i + k))
+                        set_field(0, 3 + 19 - i + k, 0)
+                        set_field(1, 13 + 19 - i, get_field(0, 3 + 19 + 19 - i + k))
+                        set_field(0, 3 + 19 + 19 - i + k, 0)
+                        set_field(1, 13 + 19 + 20 - i, get_field(0, 3 + 19 + 19 + 20 - i + k))
+                        set_field(0, 3 + 19 + 20 - i + k, 0)
+                    else:
+                        set_field(1, 13 - i, key)
+                        set_field(1, 13 + 19 - i, value)
+                        set_field(1, 13 + 19 + 20 - i, workingID)
+                        k = 1
+            else:
+                for i in range(1, 11):
+                    set_field(1, 13 - i, get_field(0, 3 + 19 - i))
+                    set_field(0, 3 + 19 - i, 0)
+                    set_field(1, 13 + 19 - i, get_field(0, 3 + 19 + 19 - i))
+                    set_field(0, 3 + 19 + 19 - i, 0)
+                    set_field(1, 13 + 19 + 20 - i, get_field(0, 3 + 19 + 19 + 20 - i))
+                    set_field(0, 3 + 19 + 19 + 20 - i, 0)
+
+                for i in reversed(range(0, 10)):
+                    if get_field(0, 2 + i) > key:
+                        set_field(0, 3 + i, get_field(0, 3 + i - 1))
+                        set_field(0, 3 + 19 + i, get_field(0, 3 + 19 + i - 1))
+                        set_field(0, 3 + 19 + 20 + i, get_field(0, 3 + 19 + 20 + i - 1))
+                    else:
+                        set_field(0, 3 + i, key)
+                        set_field(0, 3 + 19 + i, value)
+                        set_field(0, 3 + 19 + 20 + i, workingID)
+                        break
+                midKey = get_field(0, 2 + 10)
+                midVal = get_field(0, 2 + 19 + 10)
+
+                set_field(0, 12, 0)
+                set_field(0, 2 + 19 + 10, 0)
+
+                set_block(filename, get_field(0, 0) + 1, 0)
+                set_block(filename, get_field(1, 0) + 1, 1)
+
+                file.close()
+                promote_key(filename, midKey, midVal)
 
 def search_file(filename, val):
     try:
@@ -192,6 +350,9 @@ def search_file(filename, val):
     workingFile.close()
 
 def load_file(indexFileName, csvFileName):
+    create_file(indexFileName)
+    print("DELETE THIS")
+
     try:
         workingcsvFile = open(csvFileName, "r")
     except FileNotFoundError:
@@ -208,6 +369,8 @@ def load_file(indexFileName, csvFileName):
 
     for i in range(0, len(keys)):
         insert_into(indexFileName, int(keys[i]), int(vals[i]))
+
+    print_file(indexFileName)
 
 
 def print_file(filename):
