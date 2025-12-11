@@ -466,3 +466,9 @@ I believe that now I can scale up the B-tree arbitrarily large and it will still
 The problem with testing that however, is how long it takes to go through all the entries to check them
 It would be possible to output to a file then use tools there, but that is more commitment than I'm willing to do
 Furthermore, I only have around 3 hours until I fall down a late work bracket
+
+The issue is not that a value is getting dropped
+Rather, a shadow key is getting created during the splitting process
+This is the exact same issue as before
+This was caused by me doing 2 versions of split depending on where in incoming value was
+While I fixed one version, the other version still had the bug
