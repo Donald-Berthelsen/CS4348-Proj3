@@ -101,7 +101,7 @@ def insert_into(filename, key, val):
         workingFile.close()
         sys.exit()
 
-    nextBlock = get_field(0, 2) + 1
+    nextBlock = get_field(0, 2)
     if nextBlock == 1:
         set_field(0, 2, 1)
         set_block(filename, 0, 0)
@@ -128,7 +128,7 @@ def insert_into(filename, key, val):
                 if key >= workingKey and key <= get_field(0, i + 1 + 3):
                     nextBlock = get_field(0, 3 + 19 + 19 + i + 1) + 1
                     break
-
+    
     if blockSize < 19:
         set_field(0, 2, get_field(0, 2) + 1)
         for i in reversed(range(0, blockSize + 1)):
@@ -142,6 +142,7 @@ def insert_into(filename, key, val):
 
         workingFile.close()
         set_block(filename, nextBlock, 0)
+        
     else:
         workingFile.close()
         split_node(filename, key, val)
@@ -198,10 +199,49 @@ def split_node(filename, key, value):
     set_block(filename, get_field(1, 0) + 1, 1)
 
     file.close()
-    #promote_key(filename, midKey, midVal)
+    promote_key(filename, midKey, midVal)
 
 def promote_key(filename, key, value):
     file = open(filename, "rb")
+
+    if get_field(2, 1) == get_field(0, 1):
+        get_block(file, 0, 2)
+        set_field(2, 1, get_field(2, 2))
+        ID = get_field(2, 2)
+        set_field(0, 1, ID)
+        set_field(1, 1, ID)
+        set_block(filename, get_field(0, 0) + 1, 0)
+        set_block(filename, get_field(1, 0) + 1, 1)
+        set_field(2, 2, ID + 1)
+        set_block(filename, 0, 2)
+        storedBlocks[2] = bytearray(b'\x00' * 512)
+
+        set_field(2, 0, ID)
+        set_field(2, 2, 1)
+        set_field(2, 3, key)
+        set_field(2, 3 + 19, value)
+        set_field(2, 3 + 19 + 19, get_field(0, 0))
+        set_field(2, 3 + 19 + 19 + 1, get_field(1, 0))
+        file.close()
+        set_block(filename, ID + 1, 2)
+    else:
+        get_block(file, get_field(0, 1) + 1, 2)
+        parSize = get_field(2, 2)
+        if parSize < 19:
+            set_field(2, 2, get_field(2, 2) + 1)
+            for i in reversed(range(0, parSize + 1)):
+                if get_field(2, 2 + i) > key:
+                    set_field(2, 3 + i, get_field(2, 3 + i - 1))
+                    set_field(2, 3 + 19 + i, get_field(2, 3 + 19 + i - 1))
+                    set_field(2, 3 + 19 + 20 + i, get_field(2, 3 + 19 + 20 + i - 1))
+                else:
+                    set_field(2, 3 + i, key)
+                    set_field(2, 3 + 19 + i, value)
+                    set_field(2, 3 + 19 + 20 + i, get_field(1, 0))
+                    break
+            file.close()
+            set_block(filename, get_field(0, 1) + 1, 2)
+
 
     """
     if get_field(2, 1) == get_field(0, 1):
