@@ -434,3 +434,19 @@ It turns out the last pointer error was actually with my debug display method, t
 Now on to the misplaced key once again
 The keys get misplaced because the intermediate nodes are missing a pointer somewhere
 This misaligns the pointers, causing the key to get inserted in the wrong place
+
+The reason it seemed like one node had 2 domains was because it was that way
+Some nodes have multiple pointers to them
+
+[7:20 am]
+I think I solved the multiple pointers problem
+I at least solved some internal nodes not having enough pointers
+Except for the part where I have a key promote to a leaf node
+Now I have to figure out why leaf 0 was targeted for the promotion
+
+The answer is that the key want to promote to make a new root
+But then it misinterprets the parent id and goes to node 0 instead
+Fixing my new vs old root detection again and now that problem is solved
+Now all my leaf nodes follow a nice tight ordered range of values
+Granted, the internal nodes still have some keys that they shouldn't have
+That means tracking down the source of those keys, just like I did for the leaves
