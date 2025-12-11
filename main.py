@@ -57,7 +57,7 @@ def print_block(memoryDest):
     print("Block Pointers:\t", end = '')
     for i in range(0, 19):
         print(f"{get_field(memoryDest, 3 + 19 + 19 + i)}", end = ',')
-    print(f"{get_field(memoryDest, 3 + 19 + 19)}")
+    print(f"{get_field(memoryDest, 3 + 19 + 19 + 19)}")
 
 def set_block(filename, blockNumber, memNumber):
     workingFile = open(filename, "r+b")
@@ -109,6 +109,9 @@ def insert_into(filename, key, val):
     while True:
         get_block(workingFile, nextBlock + 1, 0)
         blockSize = get_field(0, 2)
+
+        if key == 4774:
+            print_block(0)
 
         if get_field(0, 3 + 19 + 19) == get_field(0, 3 + 19 + 19 + 1):
             break
@@ -168,13 +171,20 @@ def split_node(filename, key, value, newRoot = False, pointer = 0):
                 set_field(0, 3 + 19 - i + k, 0)
                 set_field(1, 13 + 19 - i, get_field(0, 3 + 19 + 19 - i + k))
                 set_field(0, 3 + 19 + 19 - i + k, 0)
+                #if newRoot:
+                #    print(get_field(0, 3 + 19 + 19 + 20 - i + k))
                 set_field(1, 13 + 19 + 19 - i, get_field(0, 3 + 19 + 19 + 20 - i + k))
                 set_field(0, 3 + 19 + 19 + 20 - i + k, 0)
             else:
+                #if(newRoot):
+                #    print(f"\n\n{key}\n\n\n\n\n{pointer}\n\n\n\n")
                 set_field(1, 13 - i, key)
                 set_field(1, 13 + 19 - i, value)
                 set_field(1, 13 + 19 + 19 - i, pointer)
                 k = 1
+            #if newRoot:
+                #print_block(0)
+                #print_block(1)
     else:
         for i in range(1, 11):
             set_field(1, 13 - i, get_field(0, 3 + 19 - i))
@@ -201,15 +211,17 @@ def split_node(filename, key, value, newRoot = False, pointer = 0):
 
     set_field(0, 12, 0)
     set_field(0, 2 + 19 + 10, 0)
-
+    #if newRoot:
+    #    print_block(0)
+    #    print_block(1)
     set_block(filename, get_field(0, 0) + 1, 0)
     set_block(filename, get_field(1, 0) + 1, 1)
 
     file.close()
     expandingDepth = get_field(2, 1) == 0
-    promote_key(filename, midKey, midVal, midPointer, expandingDepth or newRoot)
+    promote_key(filename, midKey, midVal, expandingDepth or newRoot)
 
-def promote_key(filename, key, value, pointer, expandingDepth):
+def promote_key(filename, key, value, expandingDepth):
     file = open(filename, "rb")
 
     if expandingDepth:
@@ -254,122 +266,11 @@ def promote_key(filename, key, value, pointer, expandingDepth):
             get_block(file, 0, 2)
             get_block(file, ID + 1, 0)
             file.close()
+            print_block(0)
             if ID == get_field(2, 1):
-                split_node(filename, key, value, True, pointer)
+                split_node(filename, key, value, True, ID)
             else:
-                split_node(filename, key, value, False, pointer)
-
-
-    """
-    if get_field(2, 1) == get_field(0, 1):
-        rootID = get_field(2, 1)
-        get_block(file, rootID + 1, 2)
-        #print_block(2)
-        if get_field(2, 2) < 19:
-            print(get_field(2, 2))
-            spaceInRoot = True
-        else:
-            print("LKASJLAKJSLAKJ")
-            get_block(file, 0, 2)
-            set_field(2, 1, get_field(2, 2))
-            ID = get_field(2, 2)
-            set_field(0, 1, ID)
-            set_field(1, 1, ID)
-            set_block(filename, get_field(0, 0) + 1, 0)
-            set_block(filename, get_field(1, 0) + 1, 1)
-            set_field(2, 2, ID + 1)
-            set_block(filename, 0, 2)
-            storedBlocks[2] = bytearray(b'\x00' * 512)
-
-            set_field(2, 0, ID)
-            set_field(2, 2, 1)
-            set_field(2, 3, key)
-            set_field(2, 3 + 19, value)
-            set_field(2, 3 + 19 + 19, get_field(0, 0))
-            set_field(2, 3 + 19 + 19 + 1, get_field(1, 0))
-            file.close()
-            set_block(filename, ID + 1, 2)
-
-            return
-
-    get_block(file, get_field(2, 1) + 1, 2)
-    blockSize = get_field(2, 2)
-    if blockSize < 19:
-        set_field(2, 2, get_field(2, 2) + 1)
-        for i in reversed(range(0, blockSize + 1)):
-            if get_field(2, 2 + i) > key:
-                set_field(2, 3 + i, get_field(2, 3 + i - 1))
-                set_field(2, 3 + 19 + i, get_field(2, 3 + 19 + i - 1))
-                set_field(2, 3 + 19 + 20 + i, get_field(2, 3 + 19 + 20 + i - 1))
-            else:
-                set_field(2, 3 + i, key)
-                set_field(2, 3 + 19 + i, value)
-                set_field(2, 3 + 19 + 20 + i, get_field(1, 0))
-                break
-        file.close()
-        set_block(filename, get_field(2, 0) + 1, 2)
-    else:
-        workingID = get_field(1, 0)
-
-        storedBlocks[0] = storedBlocks[2]
-        storedBlocks[1] = bytearray(b'\x00' * 512)
-
-        get_block(file, 0, 2)
-        newID = get_field(2, 2)
-        set_field(2, 2, newID + 1)
-        set_block(filename, 0, 2)
-
-        set_field(1, 0, newID)
-        set_field(1, 1, get_field(0, 1))
-        set_field(1, 2, 10)
-        set_field(0, 2, 9)
-
-        midVal = get_field(2, 2 + 10)
-        if key >= midVal:
-            k = 0
-            for i in range(1, 11):
-                if get_field(0, 22 - i) > key or k == 1:
-                    set_field(1, 13 - i, get_field(0, 3 + 19 - i + k))
-                    set_field(0, 3 + 19 - i + k, 0)
-                    set_field(1, 13 + 19 - i, get_field(0, 3 + 19 + 19 - i + k))
-                    set_field(0, 3 + 19 + 19 - i + k, 0)
-                    set_field(1, 13 + 19 + 20 - i, get_field(0, 3 + 19 + 19 + 20 - i + k))
-                    set_field(0, 3 + 19 + 20 - i + k, 0)
-                else:
-                    set_field(1, 13 - i, key)
-                    set_field(1, 13 + 19 - i, value)
-                    set_field(1, 13 + 19 + 20 - i, workingID)
-                    k = 1
-        else:
-            for i in range(1, 11):
-                set_field(1, 13 - i, get_field(0, 3 + 19 - i))
-                set_field(0, 3 + 19 - i, 0)
-                set_field(1, 13 + 19 - i, get_field(0, 3 + 19 + 19 - i))
-                set_field(0, 3 + 19 + 19 - i, 0)
-                set_field(1, 13 + 19 + 20 - i, get_field(0, 3 + 19 + 19 + 20 - i))
-                set_field(0, 3 + 19 + 19 + 20 - i, 0)
-
-            for i in reversed(range(0, 10)):
-                if get_field(0, 2 + i) > key:
-                    set_field(0, 3 + i, get_field(0, 3 + i - 1))
-                    set_field(0, 3 + 19 + i, get_field(0, 3 + 19 + i - 1))
-                    set_field(0, 3 + 19 + 20 + i, get_field(0, 3 + 19 + 20 + i - 1))
-                else:
-                    set_field(0, 3 + i, key)
-                    set_field(0, 3 + 19 + i, value)
-                    set_field(0, 3 + 19 + 20 + i, workingID)
-                    break
-            midKey = get_field(0, 2 + 10)
-            midVal = get_field(0, 2 + 19 + 10)
-
-            set_field(0, 12, 0)
-            set_field(0, 2 + 19 + 10, 0)
-
-            set_block(filename, get_field(0, 0) + 1, 0)
-            set_block(filename, get_field(1, 0) + 1, 1)
-
-            file.close()
-            promote_key(filename, midKey, midVal)"""
+                split_node(filename, key, value, False, ID)
 
 def search_file(filename, val):
     try:
