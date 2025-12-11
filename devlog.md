@@ -417,3 +417,20 @@ And for the vast majority of values I use, they are larger than the block size
 But for block 0 specifically, there was a chance that it would have a value smaller than the block size
 This is because the smallest values in the B-tree go on block 0
 This was solved with a simple check on if we reached the block size field so we can stop before it
+
+Now I need to figure out why some key get misplaced
+I'll start at the leaves and trace the path problematic insertions take
+
+And the problem is quickly revealed to be the intermediate nodes having incorrect pointers
+Specifically, some pointers get shifted around to invalid positions
+
+During the split of an internal node, the new node does not have properly set pointers
+Also it looks like I'm failing to set the last pointer of a block
+Also the block size value doesn't match the actual block size sometimes
+
+[6:00 am]
+It turns out the last pointer error was actually with my debug display method, the code itself was fine
+
+Now on to the misplaced key once again
+The keys get misplaced because the intermediate nodes are missing a pointer somewhere
+This misaligns the pointers, causing the key to get inserted in the wrong place
